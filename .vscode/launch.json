@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "API (uvicorn --reload)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["backend.app.main:app", "--reload", "--port", "8000"],
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": false
+    },
+    {
+      "name": "RQ worker",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "rq",
+      "args": ["worker", "securewatch"],
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Endpoint agent (local, authorized host only)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "securewatch_agent",
+      "cwd": "${workspaceFolder}/agent",
+      "args": ["--config", "agent.example.yaml"]
+    },
+    { "name": "pytest (current file)", "type": "debugpy", "request": "launch", "module": "pytest", "args": ["${file}", "-vv"] }
+  ]
+}
