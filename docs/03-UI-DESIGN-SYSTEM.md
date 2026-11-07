@@ -1,4 +1,4 @@
-# SecureWatch AI — UI/UX Design System & Wireframes
+# Sentrix — UI/UX Design System & Wireframes
 
 Token reference (colors, type, spacing, motion, responsive rules): **`../design-tokens.md`** — that file is the single source of truth and maps 1:1 to `frontend/src/styles/tokens.css`.
 This document covers the parts a token file can't express: layout, wireframes, component anatomy and interaction rules.
@@ -32,7 +32,7 @@ Four data origins, four fixed visual treatments, used identically on every page:
 |---|---|---|---|---|
 | Raw endpoint telemetry | cyan `#38BDF8` | terminal | `TELEMETRY` | JetBrains Mono |
 | Retrieved document | teal `#2DD4BF` | file-text | `DOC · name p.N` | Inter |
-| Historical SecureWatch data | slate `#94A3B8` | history | `HISTORY · INC-####` | Inter |
+| Historical Sentrix data | slate `#94A3B8` | history | `HISTORY · INC-####` | Inter |
 | AI-generated | violet `#A78BFA` | sparkles | `AI` | Inter |
 
 Implemented once as `<ProvenanceTag origin=…>` and `<SourceChip>`; no page may improvise its own colors for these. This is what stops the product from feeling like a chatbot with a dark theme.
@@ -52,7 +52,7 @@ Implemented once as `<ProvenanceTag origin=…>` and `<SourceChip>`; no page may
 ## 4. Navigation
 
 ```
-SECUREWATCH AI                 [«]
+SENTRIX                        [«]
  ── MONITOR ───────────────
  ◈ Dashboard                     ← accent pill + 2px left bar when active
  ▣ Endpoints                48
@@ -217,3 +217,16 @@ Breakpoint behavior is specified in `design-tokens.md` §Responsive. Additional 
 1 tokens.css → 2 AppShell/Sidebar/TopBar → 3 primitives (Card, Button, Badge, Table, Skeleton, EmptyState) → 4 security primitives (SeverityBadge, StatusDot, ProvenanceTag, SourceChip) → 5 charts → 6 Dashboard → 7 Endpoints + detail → 8 Events → 9 AI Center → 10 RAG Center → 11 Assistant → 12 Incident Investigation → 13 Settings/Reports → 14 a11y + performance pass.
 
 Do not move to the next item until the current one renders correctly in all five states (default/loading/empty/error/dense) at 1440, 1280 and 1024 px.
+
+
+---
+
+## Sentrix 2.0 additions
+
+- **Brand mark:** hexagonal lens (`SW.LOGO_SVG`, `ui-prototype/assets/favicon.svg`) with a cyan → indigo gradient (`#22D3EE` → `#6366F1`). Wordmark "SENTRIX" in Satoshi, letter-spaced; sub-label "Security Operations".
+- **Navigation:** new group **Email Identity Intelligence** — Email Verification · Domain Intelligence · Email Authentication · Ownership Verification · Email Risk Analysis · Investigation History. A sub-nav strip repeats the six sections on every page of the module.
+- **Validity ladder:** six stacked layers (syntax → domain → mail infrastructure → SPF/DKIM/DMARC → verified ownership → real-world identity). Each layer has its own pass / warn / fail / not-assessed pill so users never read a pass in one layer as a pass in the next. "Real-world identity" is always *not assessed*.
+- **Status pills** (`.st-*`): pass/valid (green), warn/monitoring (amber), fail/invalid (red), pending (blue), neutral/not checked (slate).
+- **Risk pills** (`.risk-*`): low / guarded / elevated / high, always shown with a numeric score and a confidence %.
+- **Findings cards:** title, severity, category, layer, impact weight, confidence, an `EVIDENCE` line and a recommendation.
+- **API chip:** topbar indicator showing whether the Sentrix backend is connected; pages that need the backend show a retry state instead of fake data.

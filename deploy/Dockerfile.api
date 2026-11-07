@@ -1,13 +1,19 @@
+# Sentrix 2.0 — API + web app
 FROM python:3.12-slim
+LABEL org.opencontainers.image.title="Sentrix API" \
+      org.opencontainers.image.description="Sentrix — Intelligent Security Operations, Threat Detection and Digital Identity Intelligence Platform" \
+      org.opencontainers.image.version="2.0.0" \
+      org.opencontainers.image.vendor="Sentrix"
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends libmagic1 curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./backend/
 COPY scripts/ ./scripts/
-RUN useradd -m app && chown -R app /app
+COPY ui-prototype/ ./ui-prototype/
+RUN mkdir -p reports outbox && useradd -m app && chown -R app /app
 USER app
 EXPOSE 8000
-HEALTHCHECK CMD curl -fs http://localhost:8000/api/v1/healthz || exit 1
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+HEALTHCHECK CMD curl -fs http://localhost:8000/api/healthz || exit 1
+CMD ["sh", "-c", "alembic -c backend/alembic.ini upgrade head && uvicorn backend.app.main:app --host 0.0.0.0 --port 8000"]

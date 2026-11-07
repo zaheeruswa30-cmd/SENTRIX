@@ -1,4 +1,4 @@
-/* SecureWatch AI — Reports and Settings (incl. Demo mode + Admin users panel). */
+/* Sentrix — Reports and Settings (incl. Demo mode + Admin users panel). */
 (function () {
   'use strict';
   var SW = window.SW;
@@ -57,7 +57,7 @@
     });
     host.querySelector('#snapBtn').addEventListener('click', function () {
       var c = SW.counts(), st = SW.rag.stats();
-      var md = ['# SecureWatch AI — fleet snapshot', '', 'Generated ' + new Date().toISOString() + ' (synthetic demo data)', '',
+      var md = ['# Sentrix — fleet snapshot', '', 'Generated ' + new Date().toISOString() + ' (synthetic demo data)', '',
         '| Metric | Value |', '| --- | --- |',
         '| Endpoints | ' + c.total + ' |', '| Online | ' + c.online + ' |',
         '| Events in window | ' + c.events + ' |', '| Critical events | ' + c.crit + ' |',
@@ -68,10 +68,10 @@
       var blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
-      a.href = url; a.download = 'securewatch-snapshot.md';
+      a.href = url; a.download = 'sentrix-snapshot.md';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
-      SW.toast('Snapshot exported', 'securewatch-snapshot.md written from live counters', 'ok');
+      SW.toast('Snapshot exported', 'sentrix-snapshot.md written from live counters', 'ok');
     });
     drawKpis(); drawList();
   } });

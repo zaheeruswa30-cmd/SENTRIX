@@ -1,4 +1,4 @@
-/* SecureWatch AI — SPA core: in-memory store, hash router, app shell, UI primitives.
+/* Sentrix — SPA core: in-memory store, hash router, app shell, UI primitives.
    NO browser storage of any kind is used anywhere (those APIs are unavailable in the
    preview iframe). All state lives in the SW.state object below and is intentionally
    lost on reload. */
@@ -65,6 +65,27 @@
     win: '<path d="M3 5.5l8-1.1v7.1H3zM13 4.1L21 3v8.5h-8zM3 12.5h8v7.1l-8-1.1zM13 12.5h8V21l-8-1.1z"/>',
     linux: '<path d="M9 4a3 3 0 016 0v3.5c0 1 .6 1.8 1.3 2.7 1 1.3 1.7 2.6 1.7 4.3 0 3.2-2.7 5.5-6 5.5s-6-2.3-6-5.5c0-1.7.7-3 1.7-4.3C8.4 9.3 9 8.5 9 7.5z"/><path d="M10.2 8.3h3.6"/>',
     mac: '<path d="M16 3c-1.6.2-3 1.5-3.2 3 1.6.1 3.2-1.4 3.2-3z"/><path d="M19.5 16.4c-.5 1.2-1.4 3-2.6 3.5-1 .5-1.7 0-2.9 0s-2 .5-2.9 0c-1.3-.6-2.4-2.7-3-4.5-.9-2.7-.4-6 1.5-7.4 1-.8 2.3-.8 3.3-.3.9.5 1.6.5 2.5 0 1-.5 2.4-.6 3.4.3-1.9 1.2-2.3 4.3-1.3 6.3.5 1 1.3 1.7 2 2.1z"/>'
+  };
+  Object.assign(ico, {
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>',
+    key: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/>',
+    badgecheck: '<path d="M12 3l2.2 1.6 2.7-.2.9 2.6 2.3 1.4-.8 2.6.8 2.6-2.3 1.4-.9 2.6-2.7-.2L12 21l-2.2-1.6-2.7.2-.9-2.6-2.3-1.4.8-2.6-.8-2.6 2.3-1.4.9-2.6 2.7.2z"/><path d="M8.8 12.2l2.2 2.2 4.3-4.6"/>',
+    gauge: '<path d="M4 17a8 8 0 1116 0"/><path d="M12 17l4-5"/><circle cx="12" cy="17" r="1.2"/>',
+    history: '<path d="M3.5 12a8.5 8.5 0 102.5-6"/><path d="M3 4v4h4"/><path d="M12 8v4.5l3 2"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    refresh: '<path d="M20 11a8 8 0 00-14.5-4.5L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0014.5 4.5L20 16"/><path d="M20 20v-4h-4"/>',
+    download: '<path d="M12 4v11"/><path d="M7 10.5l5 5 5-5"/><path d="M5 20h14"/>'
+  });
+  /* Sentrix brand mark: a hexagonal sentinel lens with an inner scanning arc. */
+  SW.LOGO_SVG = function (size, label) {
+    var s = size || 28;
+    return '<svg class="sentrix-logo" width="' + s + '" height="' + s + '" viewBox="0 0 32 32" role="img" aria-label="' + (label || 'Sentrix logo') + '">' +
+      '<defs><linearGradient id="sxg" x1="4" y1="3" x2="28" y2="29" gradientUnits="userSpaceOnUse">' +
+      '<stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#6366F1"/></linearGradient></defs>' +
+      '<path d="M16 2.5l11.7 6.75v13.5L16 29.5 4.3 22.75V9.25z" fill="none" stroke="url(#sxg)" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M10.2 19.4a6.6 6.6 0 0111.6-6.4" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round"/>' +
+      '<path d="M21.8 12.6a6.6 6.6 0 01-11.6 6.4" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" opacity=".85"/>' +
+      '<circle cx="16" cy="16" r="2.4" fill="#E6FBFF"/></svg>';
   };
   SW.icon = function (name, size) {
     return '<svg width="' + (size || 18) + '" height="' + (size || 18) + '" viewBox="0 0 24 24" fill="none" ' +
@@ -255,6 +276,17 @@
 
   function parseHash() {
     var h = (location.hash || '').replace(/^#\/?/, '');
+    var qi = h.indexOf('?');
+    SW.hashQuery = {};
+    if (qi >= 0) {
+      h.slice(qi + 1).split('&').forEach(function (kv) {
+        if (!kv) return;
+        var i = kv.indexOf('=');
+        var k = decodeURIComponent(i < 0 ? kv : kv.slice(0, i));
+        SW.hashQuery[k] = i < 0 ? '' : decodeURIComponent(kv.slice(i + 1).replace(/\+/g, ' '));
+      });
+      h = h.slice(0, qi);
+    }
     var parts = h.split('/').filter(Boolean);
     return { name: parts[0] || (SW.state.user ? 'dashboard' : 'login'), param: parts[1] || null, raw: h };
   }
@@ -277,23 +309,29 @@
       { id: 'rag', label: 'RAG Intelligence', icon: 'rag' },
       { id: 'knowledge-base', label: 'Knowledge Base', icon: 'kb' }
     ] },
+    { group: 'Email Identity Intelligence', items: [
+      { id: 'email-verification', label: 'Email Verification', icon: 'mail' },
+      { id: 'email-domain', label: 'Domain Intelligence', icon: 'globe' },
+      { id: 'email-auth', label: 'Email Authentication', icon: 'key' },
+      { id: 'email-ownership', label: 'Ownership Verification', icon: 'badgecheck' },
+      { id: 'email-risk', label: 'Email Risk Analysis', icon: 'gauge' },
+      { id: 'email-history', label: 'Investigation History', icon: 'history' }
+    ] },
     { group: 'Workspace', items: [
       { id: 'assistant', label: 'Assistant', icon: 'chat' },
       { id: 'reports', label: 'Reports', icon: 'reports' },
       { id: 'settings', label: 'Settings', icon: 'settings' }
     ] }
   ];
-  var PARENT = { 'endpoint': 'endpoints', 'incident': 'incidents', 'event': 'events' };
+  var PARENT = { 'endpoint': 'endpoints', 'incident': 'incidents', 'event': 'events', 'email-record': 'email-verification' };
 
   function shellHTML(active) {
     var u = SW.state.user;
     var initials = u.name.split(/\s+/).map(function (p) { return p[0]; }).join('').slice(0, 2).toUpperCase();
     return '' +
       '<aside class="sidebar" id="sidebar">' +
-        '<div class="brand">' +
-          '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-label="SecureWatch AI logo">' +
-          '<path d="M12 2.6l8 3v6.1c0 5.2-3.4 8.7-8 9.9-4.6-1.2-8-4.7-8-9.9V5.6z"/><circle cx="12" cy="11.4" r="2.8"/><path d="M12 5.9v2.7M12 14.2v2.9"/></svg>' +
-          '<div class="brand-text"><div class="brand-name">SecureWatch AI</div><div class="brand-sub">XDR Console · Demo</div></div>' +
+        '<div class="brand">' + SW.LOGO_SVG(28) +
+          '<div class="brand-text"><div class="brand-name">SENTRIX</div><div class="brand-sub">Security Operations</div></div>' +
         '</div>' +
         '<nav class="nav" aria-label="Primary">' +
           NAV.map(function (g) {
@@ -313,8 +351,10 @@
             '<input type="search" id="topSearch" placeholder="Search endpoints, events, documents…" aria-label="Global search" autocomplete="off">' +
             '<span class="kbd">⌘K</span></div>' +
           '<div class="topbar-spacer"></div>' +
-          '<span class="ai-chip" title="Honest labelling of the analysis engine">' + SW.icon('ai', 14) +
-            'Simulated analysis engine — deterministic rules + client-side retrieval, no LLM</span>' +
+          '<span class="ai-chip" title="Honest labelling of the analysis engines">' + SW.icon('ai', 14) +
+            'Endpoint telemetry: simulated · Email Identity: live backend checks</span>' +
+          '<span class="api-chip ' + (SW.api && SW.api.authed() ? 'on' : 'off') + '" id="apiChip" title="Sentrix API connection">' +
+            '<i class="dot"></i>' + (SW.api && SW.api.authed() ? 'API connected' : 'API offline') + '</span>' +
           '<span class="demo-badge"><i class="dot"></i>DEMO DATA</span>' +
           '<span class="role-chip role-' + u.role.toLowerCase() + '">' + SW.icon('shield', 13) + u.role + '</span>' +
           '<div class="usermenu-wrap">' +
@@ -394,6 +434,7 @@
   }
 
   SW.signOut = function () {
+    if (SW.api) SW.api.logout();
     SW.state.user = null;
     SW.state.chat = [];
     SW.destroyCharts();
@@ -402,6 +443,7 @@
     SW.toast('Signed out', 'Session state cleared from memory.');
   };
   SW.switchAccount = function () {
+    if (SW.api) SW.api.logout();
     SW.state.user = null;
     SW.destroyCharts();
     document.getElementById('root').innerHTML = '';
@@ -512,6 +554,7 @@
       var root = document.getElementById('root');
       root.className = 'auth-root';
       root.innerHTML = '';
+      document.title = (def.title || 'Sign in') + ' · Sentrix';
       def.render(root, r.param);
       return;
     }
@@ -519,10 +562,18 @@
     host.innerHTML = '';
     host.scrollTop = 0;
     window.scrollTo(0, 0);
-    document.title = (def.title || 'SecureWatch AI') + ' · SecureWatch AI (Demo)';
+    document.title = (def.title || 'Console') + ' · Sentrix';
     def.render(host, r.param);
   }
   SW.render = render;
+  SW.updateApiChip = function () {
+    var c = document.getElementById('apiChip');
+    if (!c || !SW.api) return;
+    var on = SW.api.authed();
+    c.className = 'api-chip ' + (on ? 'on' : 'off');
+    c.innerHTML = '<i class="dot"></i>' + (on ? 'API connected' : (SW.api.online() ? 'API: not signed in' : 'API offline'));
+  };
+  document.addEventListener('sw:api-session', function () { SW.updateApiChip(); });
 
   window.addEventListener('hashchange', render);
   document.addEventListener('DOMContentLoaded', function () {

@@ -1,4 +1,7 @@
-# SecureWatch AI — System Architecture
+# Sentrix — System Architecture
+
+> Sentrix (formerly SecureWatch AI) — Intelligent Security Operations, Threat Detection and Digital Identity Intelligence Platform.
+> The Email Identity Intelligence module added in Sentrix 2.0 is documented in [`04-EMAIL-IDENTITY-INTELLIGENCE.md`](04-EMAIL-IDENTITY-INTELLIGENCE.md).
 
 **Intelligent Endpoint Security & Investigation Platform**
 Scope: **authorized, defensive** endpoint monitoring, detection, RAG-grounded investigation support. Detection and analysis only — no offensive capability, no autonomous response.
@@ -7,7 +10,7 @@ Scope: **authorized, defensive** endpoint monitoring, detection, RAG-grounded in
 
 ## 1. Design principles
 
-1. **Provenance is a first-class citizen.** Every fact shown to a user is tagged as one of four types: `TELEMETRY` (raw endpoint data), `DOC` (retrieved knowledge-base chunk), `HISTORY` (prior SecureWatch incidents), `AI` (model-generated). The UI never blends them.
+1. **Provenance is a first-class citizen.** Every fact shown to a user is tagged as one of four types: `TELEMETRY` (raw endpoint data), `DOC` (retrieved knowledge-base chunk), `HISTORY` (prior Sentrix incidents), `AI` (model-generated). The UI never blends them.
 2. **Deterministic first, LLM second.** Rule-based detection produces the event and its severity floor. The LLM explains, correlates and recommends — it never invents an alert and never silently lowers a rule-based severity.
 3. **Human-in-the-loop by construction.** The platform recommends investigation steps. Containment/response is out of scope for v1 and is architecturally separated (`response/` interface exists but is unimplemented and permission-gated).
 4. **Consent-gated collection.** An endpoint produces zero data until an operator has registered it and an enrollment token has been issued and accepted. Authorization is recorded and auditable.
@@ -19,7 +22,7 @@ Scope: **authorized, defensive** endpoint monitoring, detection, RAG-grounded in
 
 ```
 ┌──────────────────────── MONITORED ENDPOINT (authorized) ───────────────────────┐
-│  securewatch-agent (Python, runs as a service, least privilege)                │
+│  sentrix-agent (Python, runs as a service, least privilege)                │
 │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌──────────────┐  │
 │  │ Process    │ │ FileWatch  │ │ Auth/Login │ │ Network    │ │ Host/Inventory│ │
 │  │ collector  │ │ (watchdog) │ │ log reader │ │ conn. snap │ │ + heartbeat  │  │
@@ -29,7 +32,7 @@ Scope: **authorized, defensive** endpoint monitoring, detection, RAG-grounded in
 └────────────────────────────────────┬───────────────────────────────────────────┘
                     HTTPS + agent token (mTLS optional) | POST /api/v1/ingest/events
                                      ▼
-┌──────────────────────────── SECUREWATCH AI BACKEND (FastAPI) ──────────────────┐
+┌──────────────────────────── SENTRIX BACKEND (FastAPI) ─────────────────────────┐
 │  Ingest API ──► Validation/Schema ──► Event Store (Postgres) ──► Event Bus      │
 │                                                                  (Redis/RQ)     │
 │  ┌───────────────────────── Detection Engine (deterministic) ─────────────────┐ │

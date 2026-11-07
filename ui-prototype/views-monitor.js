@@ -1,4 +1,4 @@
-/* SecureWatch AI — monitoring views: dashboard, endpoints, endpoint detail, events. */
+/* Sentrix — monitoring views: dashboard, endpoints, endpoint detail, events. */
 (function () {
   'use strict';
   var SW = window.SW;
@@ -51,7 +51,7 @@
     host.querySelector('#simBtn').addEventListener('click', function () { SW.pushLiveAlert(); });
     host.querySelector('#snapBtn').addEventListener('click', function () {
       var c = SW.counts(), st = SW.rag.stats();
-      var md = ['# SecureWatch AI — fleet snapshot (synthetic demo)', '', 'Generated ' + SW.fmtDate(new Date()), '',
+      var md = ['# Sentrix — fleet snapshot (synthetic demo)', '', 'Generated ' + SW.fmtDate(new Date()), '',
         '| Metric | Value |', '|---|---|',
         '| Endpoints | ' + c.total + ' |', '| Online | ' + c.online + ' |', '| Events in window | ' + c.events + ' |',
         '| Critical events | ' + c.crit + ' |', '| Open incidents | ' + c.openInc + ' |',
@@ -60,10 +60,10 @@
       var blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
-      a.href = url; a.download = 'securewatch-snapshot.md';
+      a.href = url; a.download = 'sentrix-snapshot.md';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
-      SW.toast('Snapshot exported', 'securewatch-snapshot.md written from live in-memory counters', 'ok');
+      SW.toast('Snapshot exported', 'sentrix-snapshot.md written from live in-memory counters', 'ok');
     });
 
     setTimeout(function () {

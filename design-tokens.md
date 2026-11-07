@@ -1,4 +1,4 @@
-# SecureWatch AI — UI Design System Tokens (v1)
+# Sentrix — UI Design System Tokens (v2)
 
 Aesthetic: deep-dark SOC console. Calm surface, restrained neon used **only** to encode severity/state.
 Rule: color = meaning. Glow is reserved for CRITICAL/HIGH and live-agent states. Never decorative.
@@ -22,14 +22,15 @@ Rule: color = meaning. Glow is reserved for CRITICAL/HIGH and live-agent states.
 ### Accent (identity — one hue)
 | Role | Hex | Usage |
 |---|---|---|
-| `--accent` | `#38BDF8` | primary actions, links, active nav, focus ring |
-| `--accent-deep` | `#0EA5E9` | hover/pressed |
-| `--accent-soft` | `rgba(56,189,248,0.12)` | active nav pill, selected row tint |
+| `--accent` | `#22D3EE` | primary actions, links, active nav, focus ring |
+| `--accent-deep` | `#06B6D4` | hover/pressed |
+| `--accent-soft` | `rgba(34,211,238,0.12)` |
+| `--brand-2` | `#6366F1` | brand gradient end (logo, wordmark, primary-button gradient) | active nav pill, selected row tint |
 | `--ai` | `#A78BFA` | AI-generated content only (agents, AI analysis blocks) |
 | `--rag` | `#2DD4BF` | RAG / retrieved-document provenance only |
 
 Provenance colors are a hard contract used across the whole product:
-**cyan = raw endpoint telemetry · teal = retrieved documents · amber-neutral slate = historical SecureWatch data (`#94A3B8`) · violet = AI-generated.**
+**cyan = raw endpoint telemetry · teal = retrieved documents · amber-neutral slate = historical Sentrix data (`#94A3B8`) · violet = AI-generated.**
 
 ### Severity (semantic — never used for decoration)
 | Level | Hex | Badge bg | Icon shape (never color alone) |

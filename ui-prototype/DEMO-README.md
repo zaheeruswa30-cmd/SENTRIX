@@ -1,4 +1,6 @@
-# SecureWatch AI — Interactive Client-Side Demo
+# Sentrix — Interactive Demo
+
+> **Sentrix 2.0:** endpoint telemetry, detection and the endpoint agent pipeline below still run client-side on synthetic data. The **Email Identity Intelligence** section, sign-in, organisations, incidents created from email records, backend PDF reports and email questions to the assistant use the real FastAPI backend (`uvicorn backend.app.main:app`, see the root README).
 
 A single-page, no-backend, no-build demo of a defensive XDR triage console. Everything runs in
 the browser tab: authentication, file ingestion, retrieval, detection rules, risk scoring and
@@ -17,11 +19,13 @@ cd ui-prototype && python3 -m http.server 8099
 
 ## Seeded accounts
 
+Legacy `@securewatch.local` addresses are still accepted and mapped to `@sentrix.local`.
+
 | Role | Email | Password | Capabilities |
 | --- | --- | --- | --- |
-| Analyst | `analyst@securewatch.local` | `Demo1234!` | upload, delete, run analysis, advance incidents |
-| Admin | `admin@securewatch.local` | `Admin1234!` | everything above + Settings › Users panel |
-| Viewer | `viewer@securewatch.local` | `Viewer1234!` | read-only — upload / delete / run are disabled with a reason tooltip |
+| Analyst | `analyst@sentrix.local` | `Demo1234!` | upload, delete, run analysis, advance incidents |
+| Admin | `admin@sentrix.local` | `Admin1234!` | everything above + Settings › Users panel |
+| Viewer | `viewer@sentrix.local` | `Viewer1234!` | read-only — upload / delete / run are disabled with a reason tooltip |
 
 `Continue as demo analyst` on the sign-in screen logs straight in as the Analyst. Signup creates
 an additional in-memory account and signs you in immediately.

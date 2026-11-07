@@ -1,0 +1,15 @@
+SENTRIX — Confirm you control this mailbox
+
+$organisation asked Sentrix to confirm that the person who submitted $email can receive mail at this address.
+Purpose stated: $purpose
+
+Your one-time code: $code
+
+Or open this link to confirm: $link
+
+The code expires in $ttl minutes and can be tried at most $max_attempts times.
+If you did not expect this message, ignore it — nothing happens unless the code or link is used.
+Confirming only proves you can read this inbox; it does not share any other information.
+
+--
+Sentrix — Intelligent Security Operations, Threat Detection and Digital Identity Intelligence Platform

@@ -1,3 +1,8 @@
+# Sentrix — local container stack
+#   docker compose up -d            → Postgres + Mailpit + Sentrix API/web app on http://localhost:8000
+#   docker compose up -d mailpit    → just the SMTP catcher (web UI http://localhost:8025)
+# The project name, Postgres user/database and queue name keep their original "securewatch"
+# identifiers on purpose so existing volumes and data survive the Sentrix rebrand.
 name: securewatch-ai
 
 services:
@@ -14,8 +19,35 @@ services:
       interval: 10s
       retries: 5
 
+  # Local SMTP catcher for ownership-verification emails (EMAIL_PROVIDER=smtp, SMTP_HOST=mailpit)
+  mailpit:
+    image: axllent/mailpit:latest
+    ports: ["1025:1025", "8025:8025"]
+
+  api:
+    build: { context: ., dockerfile: deploy/Dockerfile.api }
+    image: sentrix-api:2.0
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      APP_NAME: Sentrix
+      DATABASE_URL: postgresql+psycopg://securewatch:securewatch@postgres:5432/securewatch
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-smtp}
+      SMTP_HOST: ${SMTP_HOST_DOCKER:-mailpit}
+      SMTP_PORT: ${SMTP_PORT_DOCKER:-1025}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8000}
+    ports: ["8000:8000"]
+    volumes: ["./reports:/app/reports", "./outbox:/app/outbox"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      mailpit: { condition: service_started }
+
+  # ── Endpoint-platform roadmap services (optional) ─────────────────────
+  # Enable with:  docker compose --profile endpoint up -d
   redis:
     image: redis:7-alpine
+    profiles: ["endpoint"]
     ports: ["6379:6379"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -24,31 +56,21 @@ services:
 
   qdrant:
     image: qdrant/qdrant:v1.12.4
+    profiles: ["endpoint"]
     ports: ["6333:6333", "6334:6334"]
     volumes: ["qdrantdata:/qdrant/storage"]
 
-  api:
-    build: { context: ., dockerfile: deploy/Dockerfile.api }
-    env_file: [.env]
-    environment:
-      DATABASE_URL: postgresql+psycopg://securewatch:securewatch@postgres:5432/securewatch
-      REDIS_URL: redis://redis:6379/0
-      QDRANT_URL: http://qdrant:6333
-    ports: ["8000:8000"]
-    volumes: ["./uploads:/app/uploads", "./reports:/app/reports"]
-    depends_on:
-      postgres: { condition: service_healthy }
-      redis: { condition: service_healthy }
-      qdrant: { condition: service_started }
-
   worker:
     build: { context: ., dockerfile: deploy/Dockerfile.worker }
-    env_file: [.env]
+    profiles: ["endpoint"]
+    env_file:
+      - path: .env
+        required: false
     environment:
       DATABASE_URL: postgresql+psycopg://securewatch:securewatch@postgres:5432/securewatch
       REDIS_URL: redis://redis:6379/0
       QDRANT_URL: http://qdrant:6333
-    volumes: ["./uploads:/app/uploads", "./reports:/app/reports"]
+    volumes: ["./reports:/app/reports"]
     depends_on: [api, redis]
 
 volumes:

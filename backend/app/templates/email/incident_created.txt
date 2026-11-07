@@ -1,0 +1,8 @@
+SENTRIX — New $kind: $incident_key
+
+$title
+Severity: $severity
+Source: $source
+Opened by: $opened_by
+
+Open in Sentrix: $link

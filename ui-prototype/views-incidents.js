@@ -1,4 +1,4 @@
-/* SecureWatch AI — incident queue and incident detail with stage advance. */
+/* Sentrix — incident queue and incident detail with stage advance. */
 (function () {
   'use strict';
   var SW = window.SW;

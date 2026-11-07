@@ -1,6 +1,8 @@
-# SecureWatch AI — UI Prototype (build notes)
+# Sentrix — UI Prototype (build notes)
 
-**Location:** `/home/user/workspace/securewatch-ai/ui-prototype/`
+> Historical build notes from v1. In Sentrix 2.0 the prototype is a single-page app (`index.html` + `views-*.js`) served by the FastAPI backend at `/`; the Email Identity Intelligence pages call the real API through `api.js`.
+
+**Location:** `ui-prototype/`
 **Stack:** static multi-page HTML + one `styles.css` + one `app.js` (vanilla), Chart.js 4.4.1 via CDN,
 Satoshi (Fontshare) + Inter + JetBrains Mono (Google Fonts). No build step, no backend, no network calls.
 
@@ -35,4 +37,4 @@ Satoshi (Fontshare) + Inter + JetBrains Mono (Google Fonts). No build step, no b
 ## Outstanding
 Deployment could not be completed from this subagent: `pplx-tool deploy_website` returns
 `tool_not_allowed`, and no deploy connector is available. The parent agent should run
-`deploy_website` with `project_path=/home/user/workspace/securewatch-ai/ui-prototype`.
+`deploy_website` with `project_path=<repo>/ui-prototype`.

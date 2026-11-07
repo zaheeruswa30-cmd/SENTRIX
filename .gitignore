@@ -1,21 +1,33 @@
+# Python
 .venv/
+venv/
 __pycache__/
 *.py[cod]
-.env
-.env.local
-*.db
-*.sqlite3
-uploads/*
-!uploads/.gitkeep
-reports/*
-!reports/.gitkeep
-knowledge_base/*
-!knowledge_base/.gitkeep
-node_modules/
-frontend/dist/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+
+# Local configuration / secrets
+.env
+.env.local
+
+# Local data
+*.db
+*.sqlite3
+sentrix.db
+outbox/*
+!outbox/.gitkeep
+reports/*
+!reports/.gitkeep
+uploads/*
+!uploads/.gitkeep
+knowledge_base/*
+!knowledge_base/.gitkeep
+
+# Tooling
+node_modules/
+frontend/dist/
 models_cache/
-.DS_Store
 shots/
+.DS_Store
+Thumbs.db

@@ -1,4 +1,4 @@
-/* SecureWatch AI — simulated analysis engine.
+/* Sentrix — simulated analysis engine.
    Deterministic detection rules + real client-side retrieval + deterministic risk scoring.
    There is NO large language model here: every sentence is template-composed from the
    event fields, the matched rules and the retrieved chunks. */
@@ -312,7 +312,7 @@
   /* ================= Markdown report + Blob download ================= */
   A.markdown = function (run) {
     var L = [];
-    L.push('# SecureWatch AI — Incident Analysis Report');
+    L.push('# Sentrix — Incident Analysis Report');
     L.push('');
     L.push('> SYNTHETIC DEMO OUTPUT. Generated in-browser by a simulated analysis engine');
     L.push('> (deterministic rules + client-side TF-IDF retrieval). No LLM, no live telemetry.');
@@ -386,7 +386,7 @@
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'SecureWatch-' + run.id + '-' + run.eventId + '.md';
+    a.download = 'Sentrix-' + run.id + '-' + run.eventId + '.md';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -402,7 +402,11 @@
     'Summarise the riskiest endpoints right now',
     'Which critical events are open?',
     'What happened in INC-2210?',
-    'Search the knowledge base for LSASS guidance'
+    'Search the knowledge base for LSASS guidance',
+    'Is billing@invoice-payments-portal.example technically valid?',
+    'Does example.com have legitimate mail infrastructure?',
+    'Which authentication records are missing for contact@example.com?',
+    'What is the difference between a valid email and verified ownership?'
   ];
 
   function topEvents(filterFn, n) {

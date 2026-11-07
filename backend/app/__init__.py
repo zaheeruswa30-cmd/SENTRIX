@@ -1,0 +1,1 @@
+"""Sentrix backend application package."""

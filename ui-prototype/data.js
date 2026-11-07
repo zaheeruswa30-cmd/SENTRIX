@@ -1,4 +1,4 @@
-/* SecureWatch AI — seeded synthetic dataset for the client-side demo.
+/* Sentrix — seeded synthetic dataset for the client-side demo.
    ALL data here is fabricated for demonstration. No live systems, no real hosts,
    no real users. Defensive/investigative content only — no offensive tooling and
    no response or remediation actions. */
@@ -9,9 +9,9 @@
 
   /* ---------------- Seeded accounts (client-side only, plaintext by design in a demo) -------- */
   var USERS = [
-    { id: 'u1', name: 'A. Reyes', email: 'analyst@securewatch.local', password: 'Demo1234!', role: 'Analyst', seeded: true },
-    { id: 'u2', name: 'M. Cardoso', email: 'admin@securewatch.local', password: 'Admin1234!', role: 'Admin', seeded: true },
-    { id: 'u3', name: 'J. Okafor', email: 'viewer@securewatch.local', password: 'Viewer1234!', role: 'Viewer', seeded: true }
+    { id: 'u1', name: 'A. Reyes', email: 'analyst@sentrix.local', password: 'Demo1234!', role: 'Analyst', seeded: true },
+    { id: 'u2', name: 'M. Cardoso', email: 'admin@sentrix.local', password: 'Admin1234!', role: 'Admin', seeded: true },
+    { id: 'u3', name: 'J. Okafor', email: 'viewer@sentrix.local', password: 'Viewer1234!', role: 'Viewer', seeded: true }
   ];
 
   /* ---------------- Endpoints ---------------- */

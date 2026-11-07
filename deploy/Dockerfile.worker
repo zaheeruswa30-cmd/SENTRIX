@@ -1,13 +1,16 @@
+# Sentrix — background worker (endpoint-platform roadmap; optional)
 FROM python:3.12-slim
+LABEL org.opencontainers.image.title="Sentrix worker" \
+      org.opencontainers.image.version="2.0.0" \
+      org.opencontainers.image.vendor="Sentrix"
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends libmagic1 curl && rm -rf /var/lib/apt/lists/*
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt requirements-ml.txt ./
+RUN pip install --no-cache-dir -r requirements.txt redis rq
 COPY backend/ ./backend/
 COPY scripts/ ./scripts/
 RUN useradd -m app && chown -R app /app
 USER app
-
-
-CMD ["rq", "worker", "-u", "${REDIS_URL}", "securewatch"]
+# queue name "securewatch" kept for compatibility with existing producers
+CMD ["sh", "-c", "rq worker -u \"$REDIS_URL\" securewatch"]

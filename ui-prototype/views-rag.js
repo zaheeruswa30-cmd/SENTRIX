@@ -1,4 +1,4 @@
-/* SecureWatch AI — RAG Intelligence Center and Knowledge Base views. */
+/* Sentrix — RAG Intelligence Center and Knowledge Base views. */
 (function () {
   'use strict';
   var SW = window.SW;

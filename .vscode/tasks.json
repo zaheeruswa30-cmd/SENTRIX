@@ -1,12 +1,25 @@
 {
   "version": "2.0.0",
   "tasks": [
-    { "label": "infra: up",        "type": "shell", "command": "docker compose up -d postgres redis qdrant" },
-    { "label": "db: migrate",      "type": "shell", "command": "alembic -c backend/alembic.ini upgrade head" },
-    { "label": "db: seed demo",    "type": "shell", "command": "python -m scripts.seed_demo" },
-    { "label": "api: run",         "type": "shell", "command": "uvicorn backend.app.main:app --reload --port 8000" },
-    { "label": "ui prototype: serve", "type": "shell", "command": "python -m http.server 5500 --directory ui-prototype" },
-    { "label": "frontend: dev",    "type": "shell", "command": "npm run dev", "options": { "cwd": "${workspaceFolder}/frontend" } },
-    { "label": "qa: all",          "type": "shell", "command": "ruff check . && mypy backend/app && pytest -q && bandit -q -r backend/app" }
+    {
+      "label": "Sentrix: run API + web app",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m uvicorn backend.app.main:app --reload --port 8000",
+      "isBackground": true,
+      "problemMatcher": [],
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "Sentrix: run tests",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pytest",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    { "label": "Sentrix: install dependencies", "type": "shell", "command": "${command:python.interpreterPath} -m pip install -r requirements.txt", "problemMatcher": [] },
+    { "label": "Sentrix: db migrate (alembic upgrade head)", "type": "shell", "command": "${command:python.interpreterPath} -m alembic -c backend/alembic.ini upgrade head", "problemMatcher": [] },
+    { "label": "Sentrix: seed demo data + sample checks", "type": "shell", "command": "${command:python.interpreterPath} -m scripts.seed_demo --with-checks", "problemMatcher": [] },
+    { "label": "Sentrix: docker compose up", "type": "shell", "command": "docker compose up -d --build", "problemMatcher": [] },
+    { "label": "Sentrix: mailpit (local SMTP catcher)", "type": "shell", "command": "docker compose up -d mailpit", "problemMatcher": [] }
   ]
 }

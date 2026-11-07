@@ -1,4 +1,7 @@
-# SecureWatch AI — Implementation Phases
+# Sentrix — Implementation Phases
+
+> Package paths such as `agent/securewatch_agent/` keep their original module name for compatibility.
+> Sentrix 2.0 adds Phase 11 — Email Identity Intelligence; see [`04-EMAIL-IDENTITY-INTELLIGENCE.md`](04-EMAIL-IDENTITY-INTELLIGENCE.md).
 
 Each phase is independently runnable and demoable. Do not start a phase before its predecessor's tests pass.
 Conventions: backend package root is `backend/app/`, migrations via `alembic revision --autogenerate -m "..."`, every phase ends with `pytest -q` green and a manual smoke check.

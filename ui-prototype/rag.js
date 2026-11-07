@@ -1,4 +1,4 @@
-/* SecureWatch AI — real client-side RAG: File API ingest, real text extraction
+/* Sentrix — real client-side RAG: File API ingest, real text extraction
    (FileReader / pdf.js / JSZip), real chunking, TF-IDF vectors and cosine retrieval.
    Honest label: the embedding is a client-side TF-IDF vector, not a neural model. */
 (function () {

@@ -1,4 +1,4 @@
-/* SecureWatch AI — agent pipeline UI, event detail, AI Security Center, assistant. */
+/* Sentrix — agent pipeline UI, event detail, AI Security Center, assistant. */
 (function () {
   'use strict';
   var SW = window.SW;
@@ -238,7 +238,7 @@
 
   /* ================= Assistant ================= */
   SW.route('assistant', { title: 'Assistant', render: function (host) {
-    host.innerHTML = SW.head('Security assistant', 'Answers are assembled from real retrieval over your indexed documents and lookups into the in-memory dataset',
+    host.innerHTML = SW.head('Security assistant', 'Endpoint answers use client-side retrieval over the demo dataset; email identity questions are answered by Sentrix AI on the backend with cited evidence',
       SW.engineChip()) +
       '<div class="chat-layout">' +
         '<div class="card" style="min-width:0"><div class="card-head"><h3>Context</h3></div>' +
@@ -253,13 +253,50 @@
         '<div class="card" style="min-width:0"><div class="card-head"><div><h3>Conversation</h3>' +
           '<div class="faint">Message history is in memory for this session only</div></div></div>' +
           '<div id="thread" class="thread" aria-live="polite"></div>' +
-          '<form class="composer" id="chatForm"><input id="chatInput" type="text" placeholder="Ask about an endpoint, an incident, or your uploaded documents…" aria-label="Ask the assistant" autocomplete="off">' +
+          '<form class="composer" id="chatForm"><input id="chatInput" type="text" placeholder="Ask about an endpoint, an incident, a document — or an email address…" aria-label="Ask the assistant" autocomplete="off">' +
           '<button class="btn btn-primary" type="submit">Send' + SW.icon('arrow', 15) + '</button></form>' +
-          '<p class="faint" style="margin-top:8px">Enter sends. Answers are template-composed from retrieved chunks and dataset lookups — there is no language model in this demo.</p></div>' +
+          '<p class="faint" style="margin-top:8px">Enter sends. Endpoint answers are composed client-side from the demo dataset. Email questions (addresses, SPF/DKIM/DMARC, MX, ownership) are answered by Sentrix AI on the backend with evidence citations.</p></div>' +
       '</div>';
 
     var thread = host.querySelector('#thread');
+    /* Email context from #/assistant?record=<id> (set by the email record page). */
+    if (SW.hashQuery && SW.hashQuery.record) SW.state.emailCtx = { id: SW.hashQuery.record, email: null };
+    var ctxBar = document.createElement('div');
+    ctxBar.className = 'email-ctx';
+    thread.parentNode.insertBefore(ctxBar, thread);
+    function drawCtx() {
+      var c = SW.state.emailCtx;
+      ctxBar.innerHTML = c ? SW.icon('mail', 14) + '<span>Email context: <b class="mono">' + SW.esc(c.email || c.id.slice(0, 8) + '…') + '</b> — email questions are answered by Sentrix AI from this record’s evidence.</span>' +
+        '<button class="btn btn-sm btn-ghost" id="ctxClear">Clear</button>' : '';
+      ctxBar.hidden = !c;
+      var b = ctxBar.querySelector('#ctxClear');
+      if (b) b.addEventListener('click', function () { SW.state.emailCtx = null; drawCtx(); });
+    }
+    if (SW.state.emailCtx && !SW.state.emailCtx.email && SW.api && SW.api.authed()) {
+      SW.api.get('/email-identity/records/' + SW.state.emailCtx.id).then(function (r) { if (SW.state.emailCtx) { SW.state.emailCtx.email = r.email; drawCtx(); } }, function () {});
+    }
+    drawCtx();
+    function backendHTML(d) {
+      var KIND = { ai: ['prov-ai', 'AI Analysis'], telemetry: ['prov-telemetry', 'Evidence'], rag: ['prov-rag', 'RAG Sources'],
+        history: ['prov-history', 'Historical Context'], risk: ['prov-ai', 'Risk Assessment'], steps: ['prov-ai', 'Recommended Steps'] };
+      return '<div class="answer-section as-ai"><div class="sec-head"><span class="prov-tag prov-ai"><i></i>' + SW.esc(d.assistant || 'Sentrix AI') + '</span>' +
+          '<span class="faint">' + (d.llm_used ? 'LLM-phrased, evidence-grounded' : 'Deterministic, evidence-grounded') + (d.record ? ' · ' + SW.esc(d.record.email) : '') + '</span></div>' +
+          '<p>' + SW.esc(d.summary) + '</p></div>' +
+        (d.sections || []).map(function (sec) {
+          var k = KIND[sec.kind] || KIND.ai;
+          return '<div class="answer-section as-' + SW.esc(sec.kind) + '"><div class="sec-head"><span class="prov-tag ' + k[0] + '"><i></i>' + k[1] + '</span><span class="faint">' + SW.esc(sec.title || '') + '</span></div>' +
+            (sec.text ? '<p>' + SW.esc(sec.text) + '</p>' : '') +
+            (sec.bullets && sec.bullets.length ? (sec.kind === 'steps' ? '<ol class="steps-list">' : '<ul class="list-clean">') + sec.bullets.map(function (b) { return '<li>' + SW.esc(b) + '</li>'; }).join('') + (sec.kind === 'steps' ? '</ol>' : '</ul>') : '') +
+            (sec.citations && sec.citations.length ? '<div class="chips cite-row">' + sec.citations.map(function (c) {
+              var href = c.type === 'email_record' && c.ref ? '#/email-record/' + c.ref : c.type === 'kb_chunk' ? '#/knowledge-base' : c.type === 'domain_analysis' && d.record ? '#/email-domain/' + encodeURIComponent(d.record.domain) : null;
+              return (href ? '<a class="source-chip" href="' + href + '">' : '<span class="source-chip">') + SW.icon('doc', 13) + SW.esc(c.label) + '<span class="sim">' + SW.esc(c.type.replace(/_/g, ' ')) + '</span>' + (href ? '</a>' : '</span>');
+            }).join('') + '</div>' : '') + '</div>';
+        }).join('') +
+        '<p class="faint src-foot">' + SW.esc(d.disclaimer || '') + '</p>';
+    }
     function answerHTML(a) {
+      if (a.backend) return backendHTML(a.backend);
+      if (a.backendError) return '<div class="answer-section as-ai"><div class="sec-head"><span class="prov-tag prov-ai"><i></i>Sentrix AI</span></div><p>' + SW.esc(a.backendError) + '</p></div>';
       return a.sections.map(function (s) {
         if (s.kind === 'ai') return '<div class="answer-section as-ai"><div class="sec-head"><span class="prov-tag prov-ai"><i></i>AI Analysis</span></div>' +
           s.paragraphs.map(function (p) { return '<p>' + SW.esc(p) + '</p>'; }).join('') + '</div>';
@@ -306,6 +343,22 @@
       var pending = { role: 'assistant', pending: true };
       SW.state.chat.push(pending);
       drawThread();
+      if (SW.email && SW.email.isEmailQuestion(q)) {
+        var ctx = SW.state.emailCtx;
+        var addr = (q.match(/[^\s"'<>(),;:]+@[^\s"'<>(),;:?]+\.[a-z0-9-]{2,}/i) || [])[0];
+        if (!SW.api || !SW.api.authed()) {
+          pending.pending = false;
+          pending.answer = { backendError: 'Email questions are answered by the Sentrix API, which is not connected. Start the backend (uvicorn backend.app.main:app --reload) and sign in again.' };
+          drawThread(); return;
+        }
+        SW.api.post('/ai/email/ask', { question: q, record_id: addr ? null : (ctx ? ctx.id : null), email: addr || null, run_if_missing: !!addr && SW.can('run') })
+          .then(function (d) {
+            if (d.record) SW.state.emailCtx = { id: d.record.id, email: d.record.email };
+            drawCtx();
+            pending.pending = false; pending.answer = { backend: d }; drawThread();
+          }, function (err) { pending.pending = false; pending.answer = { backendError: 'Sentrix AI could not answer: ' + err.message }; drawThread(); });
+        return;
+      }
       setTimeout(function () {
         var ans = SW.assistant.answer(q);
         pending.pending = false;
