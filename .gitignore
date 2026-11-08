@@ -1,3 +1,7 @@
+# ==========================================
+# SENTRIX 2.0 - Git Ignore Configuration
+# ==========================================
+
 # Python
 .venv/
 venv/
@@ -7,27 +11,44 @@ __pycache__/
 .ruff_cache/
 .mypy_cache/
 
-# Local configuration / secrets
+# Environment variables and secrets
 .env
-.env.local
+.env.*
+!.env.example
 
-# Local data
+# Local databases and data
 *.db
 *.sqlite3
 sentrix.db
+
+# Outbox
 outbox/*
 !outbox/.gitkeep
+
+# Reports
 reports/*
 !reports/.gitkeep
+
+# Uploads
 uploads/*
 !uploads/.gitkeep
+
+# Knowledge base
 knowledge_base/*
 !knowledge_base/.gitkeep
 
-# Tooling
+# Frontend
 node_modules/
 frontend/dist/
+
+# Models and generated files
 models_cache/
 shots/
+
+# Operating system files
 .DS_Store
 Thumbs.db
+Desktop.ini
+
+# Vercel
+.vercel/
